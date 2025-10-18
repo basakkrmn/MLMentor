@@ -54,7 +54,7 @@ MLMentor/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/MLMentor.git
+git clone https://github.com/basakkrmn/MLMentor.git
 cd MLMentor
 ```
 ### 2. Create and activate a virtual environment (optional but recommended)
