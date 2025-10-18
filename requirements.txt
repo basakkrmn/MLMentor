@@ -1,0 +1,18 @@
+# Web framework
+streamlit==1.50.0
+
+# Embeddings & NLP
+sentence-transformers==5.1.1
+torch==2.9.0
+transformers==4.57.1
+numpy==2.3.4
+
+# Gemini API
+google-generativeai==0.8.5
+
+# RAG Framework & Vector Database
+langchain==1.0.0
+chromadb==1.2.0
+
+# Environment variables
+python-dotenv==1.1.1
