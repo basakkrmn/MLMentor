@@ -1,25 +1,32 @@
+import os
 import pickle
 import numpy as np
 from sentence_transformers import SentenceTransformer
 import google.generativeai as genai
-from dotenv import load_dotenv
-import os
-import time
+import streamlit as st
+import requests
 
 # -----------------------------
-# Load environment variables
+# Load API keys from Streamlit secrets
 # -----------------------------
-load_dotenv()
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY is None:
-    raise ValueError("GEMINI_API_KEY not found in .env file")
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 
 # -----------------------------
 # Settings
 # -----------------------------
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-EMBEDDINGS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "../embeddings.pkl"))
+EMBEDDINGS_FILE = "embeddings.pkl"
 TOP_K = 3
+
+# -----------------------------
+# Download embeddings.pkl from Google Drive if not exists
+# -----------------------------
+if not os.path.exists(EMBEDDINGS_FILE):
+    file_id = "18Iq8-nyZa4aY091rfsm8WT9nODOYtFUF"  # Drive link ID
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    r = requests.get(url)
+    with open(EMBEDDINGS_FILE, "wb") as f:
+        f.write(r.content)
 
 # -----------------------------
 # Load embeddings and configure Gemini
@@ -30,13 +37,11 @@ with open(EMBEDDINGS_FILE, "rb") as f:
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 genai.configure(api_key=GEMINI_API_KEY)
 
-
 # -----------------------------
 # Helper functions
 # -----------------------------
 def cosine_similarity(vec1, vec2):
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
-
 
 def retrieve_relevant_chunks(query, top_k=TOP_K):
     query_emb = embedding_model.encode(query)
@@ -46,7 +51,6 @@ def retrieve_relevant_chunks(query, top_k=TOP_K):
         similarities.append((sim, item["text"]))
     similarities.sort(key=lambda x: x[0], reverse=True)
     return [text for _, text in similarities[:top_k]]
-
 
 # -----------------------------
 # Chatbot function
@@ -72,13 +76,12 @@ Instructions:
 Answer:
 """
     try:
-        # Use lightweight model to save quota
         model = genai.GenerativeModel('models/gemini-2.0-flash-lite')
         response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
-                temperature=0.1,  # Lower temperature for more consistent answers
-                max_output_tokens=1000  # Limit tokens to save quota
+                temperature=0.1,
+                max_output_tokens=1000
             )
         )
         return response.text
@@ -90,7 +93,6 @@ Answer:
         elif "503" in error_msg:
             return "🔧 Service temporarily unavailable. Please try again shortly."
         else:
-            # Fallback: return most relevant chunk
             if relevant_chunks:
                 return f"Based on available information:\n\n{relevant_chunks[0][:800]}..."
             else:
