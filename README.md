@@ -113,6 +113,10 @@ Make sure your GEMINI API key has sufficient quota.
 
 Streamlit cache ensures faster subsequent runs.
 
+## Demo
+
+You can try the deployed app here: [ML Mentor Chatbot](https://mlmentor-r6usqtnevvrrektgiocf9p.streamlit.app/)
+
 ## 📝 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
