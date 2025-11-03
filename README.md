@@ -117,6 +117,8 @@ Streamlit cache ensures faster subsequent runs.
 
 You can try the deployed app here: [ML Mentor Chatbot](https://mlmentor-r6usqtnevvrrektgiocf9p.streamlit.app/)
 
+⚠️ **Note:** The app runs on Streamlit Community Cloud free tier. If inactive for 18+ hours, it enters sleep mode. The first visit may take 30-60 seconds to wake up.
+
 ## 📝 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
